@@ -41,15 +41,17 @@ class AuthorController
     public function store()
     {
         $name = filter_input(INPUT_POST, 'txtAuthorName', FILTER_SANITIZE_STRING);
-
+        $message = '';
         if (!$name) {
-            echo "Invalid author name.";
+            $message = 'Tên tác giả không được để trống';
             return;
         }
 
         try {
             $this->authorService->createAuthor($name);
-            $this->redirect('index.php?controller=Author&action=index');
+            $message = 'Thêm tác giả thành công';
+            $this->render('author/add_author', ['message' => $message]);
+            // $this->redirect('index.php?controller=Author&action=index');
         } catch (Exception $e) {
             echo "Error creating author: " . $e->getMessage();
         }
@@ -58,9 +60,10 @@ class AuthorController
     public function edit()
     {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-
+        $message = '';
         if (!$id) {
-            echo "Invalid author id.";
+            $message = 'Không tìm thấy tác giả';
+            $this->render('author/edit_author', ['message' => $message]);
             return;
         }
 
@@ -77,9 +80,10 @@ class AuthorController
         $id = filter_input(INPUT_POST, 'txtAuthorId', FILTER_VALIDATE_INT);
         $name = filter_input(INPUT_POST, 'txtAuthorName', FILTER_SANITIZE_STRING);
         $imgUrl = null;
-
+        $message = '';
         if (!$id || !$name) {
-            echo "Invalid author data.";
+            $message = 'Thông tin không được để trống';
+            $this->render('author/edit_author', ['message' => $message]);
             return;
         }
 
@@ -96,7 +100,7 @@ class AuthorController
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
         if (!$id) {
-            echo "Invalid author id.";
+            echo '<script>alert("Không tìm thấy tác giả");</script>';
             return;
         }
 
