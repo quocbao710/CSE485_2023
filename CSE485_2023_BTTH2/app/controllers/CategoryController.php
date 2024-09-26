@@ -40,15 +40,18 @@ class CategoryController
     public function store()
     {
         $name = filter_input(INPUT_POST, 'txtCatName', FILTER_SANITIZE_STRING);
-
+        $message = '';
         if (!$name) {
-            echo "Invalid category name.";
+            $message = 'Tên thể loại không được để trống';
+            $this->render('category/add_category', ['message' => $message]);
             return;
         }
 
         try {
             $this->categoryService->createCategory($name);
-            $this->redirect('index.php?controller=Category&action=index');
+            $message = 'Thêm thể loại thành công';
+            $this->render('category/add_category', ['message' => $message]);
+            // $this->redirect('index.php?controller=Category&action=index');
         } catch (Exception $e) {
             echo "Error creating category: " . $e->getMessage();
         }
@@ -57,9 +60,11 @@ class CategoryController
     public function edit()
     {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        $message = isset($_GET['message']) ? $_GET['message'] : '';
 
         if (!$id) {
-            echo "Invalid category ID.";
+            $message = 'Invalid category ID.';
+            $this->render('category/edit_category', ['message' => $message]);
             return;
         }
 
@@ -67,7 +72,8 @@ class CategoryController
             $category = $this->categoryService->getCategoryById($id);
 
             if (!$category) {
-                echo "Category not found.";
+                $message = 'Thể loại không tồn tại';
+                $this->render('category/edit_category', ['message' => $message]);
                 return;
             }
 
@@ -81,15 +87,18 @@ class CategoryController
     {
         $id = filter_input(INPUT_POST, 'txtCatId', FILTER_VALIDATE_INT);
         $name = filter_input(INPUT_POST, 'txtCatName', FILTER_SANITIZE_STRING);
+        $message = '';
 
         if (!$id || !$name) {
-            echo "Invalid input.";
+            $message = 'Tên thể loại không được để trống';
+            $this->render('category/edit_category', ['message' => $message]);
             return;
         }
 
         try {
             $this->categoryService->updateCategory($id, $name);
-            $this->redirect('index.php?controller=Category&action=index');
+            $message = 'Cập nhật thể loại thành công';
+            $this->redirect('index.php?controller=Category&action=edit&id=' . $id . '&message=' . $message);
         } catch (Exception $e) {
             echo "Error updating category: " . $e->getMessage();
         }
@@ -98,9 +107,8 @@ class CategoryController
     public function delete()
     {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-
         if (!$id) {
-            echo "Invalid category ID.";
+            echo '<script>alert("Không tìm thấy thể loại");</script>';
             return;
         }
 
